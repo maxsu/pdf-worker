@@ -108,6 +108,27 @@ function pad(number, digits) {
 	return ('0'.repeat(digits - 1) + parseInt(number, 10)).slice(-digits);
 }
 
+
+/**
+ * Converts a PDF date string to a JavaScript Date object.
+ *
+ * @param {string} pdfDate - The PDF date string to convert.
+ * @returns {Date|null} A JavaScript Date object representing the PDF date, or null if invalid.
+ */
+function fromPdfDate(pdfDate) {
+	if (typeof pdfDate !== 'string') {
+		return null;
+	}
+	if (pdfDate[0] === '(' && pdfDate[pdfDate.length - 1] === ')') {
+		pdfDate = pdfDate.slice(1, -1);
+	}
+	if (pdfDate.slice(0, 2) !== 'D:') {
+		return null;
+	}
+	const part = (start, end, offset = 0) => parseInt(pdfDate.slice(start, end), 10) + offset;
+	return new Date(part(2, 6), part(6, 8, -1), part(8, 10), part(10, 12), part(12, 14), part(14, 16), 0);
+}
+
 class PDFAssembler {
 	constructor() {
 		this.pdfManager = null;
@@ -388,20 +409,6 @@ class PDFAssembler {
 			(timezoneOffset < 0 ? '+' : '-') +
 			pad(Math.abs(Math.trunc(timezoneOffset / 60)), 2) + '\'' +
 			pad(Math.abs(timezoneOffset % 60), 2) + '\'';
-	}
-
-	fromPdfDate(pdfDate) {
-		if (typeof pdfDate !== 'string') {
-			return null;
-		}
-		if (pdfDate[0] === '(' && pdfDate[pdfDate.length - 1] === ')') {
-			pdfDate = pdfDate.slice(1, -1);
-		}
-		if (pdfDate.slice(0, 2) !== 'D:') {
-			return null;
-		}
-		const part = (start, end, offset = 0) => parseInt(pdfDate.slice(start, end), 10) + offset;
-		return new Date(part(2, 6), part(6, 8, -1), part(8, 10), part(10, 12), part(12, 14), part(14, 16), 0);
 	}
 
 	removeRootEntries(entries) {
