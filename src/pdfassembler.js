@@ -658,10 +658,6 @@ class PDFAssembler {
 		}
 
 	}
-
-	bytesToString(bytes) {
-		return bytesToString(bytes);
-	}
 }
 
 module.exports = PDFAssembler;
