@@ -18,9 +18,14 @@ jobs:
       - name: Install Node modules
         run: npm ci
 
-      - name: Build pdf-worker
-        run: npm run build
+      - name: Build pdf.js
+        run: npm run build:pdfjs
         # Currently necessary for Webpack: https://stackoverflow.com/a/69746937
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+
+      - name: Build pdf-worker
+        run: npm run build:worker
         env:
           NODE_OPTIONS: --openssl-legacy-provider
 
