@@ -129,6 +129,29 @@ function fromPdfDate(pdfDate) {
 	return new Date(part(2, 6), part(6, 8, -1), part(8, 10), part(10, 12), part(12, 14), part(14, 16), 0);
 }
 
+/**
+ * Converts a JavaScript date to a PDF date string.
+ *
+ * @param {Date} jsDate - The JavaScript date to convert (default: current date).
+ * @returns {string | null} The PDF date string in 'D:YYYYMMDDHHmmss±HH' format or null if input is not a Date.
+ */
+function toPdfDate(jsDate = new Date()) {
+	if (!(jsDate instanceof Date)) {
+		return null;
+	}
+	const timezoneOffset = jsDate.getTimezoneOffset();
+	return 'D:' +
+		jsDate.getFullYear() +
+		pad(jsDate.getMonth() + 1, 2) +
+		pad(jsDate.getDate(), 2) +
+		pad(jsDate.getHours(), 2) +
+		pad(jsDate.getMinutes(), 2) +
+		pad(jsDate.getSeconds(), 2) +
+		(timezoneOffset < 0 ? '+' : '-') +
+		pad(Math.abs(Math.trunc(timezoneOffset / 60)), 2) + '\'' +
+		pad(Math.abs(timezoneOffset % 60), 2) + '\'';
+}
+
 class PDFAssembler {
 	constructor() {
 		this.pdfManager = null;
@@ -212,7 +235,7 @@ class PDFAssembler {
 				}
 				this.pdfTree['/Info']['/Producer'] = '(' + producer + ')';
 
-				this.pdfTree['/Info']['/ModDate'] = '(' + this.toPdfDate() + ')';
+				this.pdfTree['/Info']['/ModDate'] = '(' + toPdfDate() + ')';
 				this.flattenPageTree();
 			}
 			else {
@@ -224,8 +247,8 @@ class PDFAssembler {
 				'documentInfo': {},
 				'/Info': {
 					'/Producer': '(PDF Assembler)',
-					'/CreationDate': '(' + this.toPdfDate() + ')',
-					'/ModDate': '(' + this.toPdfDate() + ')'
+					'/CreationDate': '(' + toPdfDate() + ')',
+					'/ModDate': '(' + toPdfDate() + ')'
 				},
 				'/Root': {
 					'/Type': '/Catalog',
@@ -392,23 +415,6 @@ class PDFAssembler {
 		else {
 			return node;
 		}
-	}
-
-	toPdfDate(jsDate = new Date()) {
-		if (!(jsDate instanceof Date)) {
-			return null;
-		}
-		const timezoneOffset = jsDate.getTimezoneOffset();
-		return 'D:' +
-			jsDate.getFullYear() +
-			pad(jsDate.getMonth() + 1, 2) +
-			pad(jsDate.getDate(), 2) +
-			pad(jsDate.getHours(), 2) +
-			pad(jsDate.getMinutes(), 2) +
-			pad(jsDate.getSeconds(), 2) +
-			(timezoneOffset < 0 ? '+' : '-') +
-			pad(Math.abs(Math.trunc(timezoneOffset / 60)), 2) + '\'' +
-			pad(Math.abs(timezoneOffset % 60), 2) + '\'';
 	}
 
 	removeRootEntries(entries) {
