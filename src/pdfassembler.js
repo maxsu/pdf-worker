@@ -659,10 +659,6 @@ class PDFAssembler {
 
 	}
 
-	arraysToBytes(arrays) {
-		return arraysToBytes(arrays);
-	}
-
 	bytesToString(bytes) {
 		return bytesToString(bytes);
 	}
