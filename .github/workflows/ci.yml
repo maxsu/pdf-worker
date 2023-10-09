@@ -18,7 +18,15 @@ jobs:
       - name: Install Node modules
         run: npm ci
 
+      - name: Cache pdf.js
+        id: cache-pdfjs
+        uses: actions/cache@v2
+        with:
+          path: pdf.js/build
+          key: pdfjs-${{ hashFiles('pdf.js/.git/HEAD') }}
+
       - name: Build pdf.js
+        if: !steps.cache-pdfjs.outputs.cache-hit 
         run: npm run build:pdfjs
         # Currently necessary for Webpack: https://stackoverflow.com/a/69746937
         env:
