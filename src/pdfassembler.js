@@ -98,6 +98,16 @@ function arraysToBytes(arr) {
 	return data;
 }
 
+/**
+ * Pads a number with leading zeros to a given number of digits.
+ *
+ * @param {number} number - The number to pad.
+ * @param {number} digits - The total number of digits.
+ * @returns {string} The padded number. */
+function pad(number, digits) {
+	return ('0'.repeat(digits - 1) + parseInt(number, 10)).slice(-digits);
+}
+
 class PDFAssembler {
 	constructor() {
 		this.pdfManager = null;
@@ -363,10 +373,6 @@ class PDFAssembler {
 		}
 	}
 
-	pad(number, digits) {
-		return ('0'.repeat(digits - 1) + parseInt(number, 10)).slice(-digits);
-	}
-
 	toPdfDate(jsDate = new Date()) {
 		if (!(jsDate instanceof Date)) {
 			return null;
@@ -374,14 +380,14 @@ class PDFAssembler {
 		const timezoneOffset = jsDate.getTimezoneOffset();
 		return 'D:' +
 			jsDate.getFullYear() +
-			this.pad(jsDate.getMonth() + 1, 2) +
-			this.pad(jsDate.getDate(), 2) +
-			this.pad(jsDate.getHours(), 2) +
-			this.pad(jsDate.getMinutes(), 2) +
-			this.pad(jsDate.getSeconds(), 2) +
+			pad(jsDate.getMonth() + 1, 2) +
+			pad(jsDate.getDate(), 2) +
+			pad(jsDate.getHours(), 2) +
+			pad(jsDate.getMinutes(), 2) +
+			pad(jsDate.getSeconds(), 2) +
 			(timezoneOffset < 0 ? '+' : '-') +
-			this.pad(Math.abs(Math.trunc(timezoneOffset / 60)), 2) + '\'' +
-			this.pad(Math.abs(timezoneOffset % 60), 2) + '\'';
+			pad(Math.abs(Math.trunc(timezoneOffset / 60)), 2) + '\'' +
+			pad(Math.abs(timezoneOffset % 60), 2) + '\'';
 	}
 
 	fromPdfDate(pdfDate) {
